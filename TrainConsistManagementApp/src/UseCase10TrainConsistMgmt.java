@@ -1,8 +1,9 @@
+import org.junit.jupiter.api.Test;
 import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class UseCase10TrainConsistMgmt {
+public class UseCase10TrainConsistMgmtTest {
 
-    // 🔹 Reusing Bogie class
     static class Bogie {
         String name;
         int capacity;
@@ -13,34 +14,89 @@ public class UseCase10TrainConsistMgmt {
         }
     }
 
-    public static void main(String[] args) {
+    int calculateTotal(List<Bogie> bogies) {
+        return bogies.stream()
+                .map(b -> b.capacity)
+                .reduce(0, Integer::sum);
+    }
 
-        System.out.println("===========================================");
-        System.out.println("   UC10 - Count Total Seats in Train   ");
-        System.out.println("===========================================\n");
+    @Test
+    void testReduce_TotalSeatCalculation() {
+        List<Bogie> list = List.of(
+                new Bogie("Sleeper", 72),
+                new Bogie("AC Chair", 56),
+                new Bogie("First Class", 24)
+        );
 
-        // Create list of bogies
-        List<Bogie> bogies = new ArrayList<>();
+        int result = calculateTotal(list);
 
-        bogies.add(new Bogie("Sleeper", 72));
-        bogies.add(new Bogie("AC Chair", 56));
-        bogies.add(new Bogie("First Class", 24));
-        bogies.add(new Bogie("Sleeper", 70));
+        assertEquals(152, result);
+    }
 
-        // Display bogies
-        System.out.println("Bogies in Train:");
-        for (Bogie b : bogies) {
-            System.out.println(b.name + " -> " + b.capacity);
-        }
+    @Test
+    void testReduce_MultipleBogiesAggregation() {
+        List<Bogie> list = List.of(
+                new Bogie("Sleeper", 72),
+                new Bogie("Sleeper", 70),
+                new Bogie("AC Chair", 60)
+        );
 
-        // 🔹 AGGREGATION using map + reduce
-        int totalSeats = bogies.stream()
-                .map(b -> b.capacity)          // extract capacity
-                .reduce(0, Integer::sum);      // sum all
+        int result = calculateTotal(list);
 
-        // Display total
-        System.out.println("\nTotal Seating Capacity: " + totalSeats);
+        assertEquals(202, result);
+    }
 
-        System.out.println("\nUC10 aggregation completed...");
+    @Test
+    void testReduce_SingleBogieCapacity() {
+        List<Bogie> list = List.of(
+                new Bogie("Sleeper", 72)
+        );
+
+        int result = calculateTotal(list);
+
+        assertEquals(72, result);
+    }
+
+    @Test
+    void testReduce_EmptyBogieList() {
+        int result = calculateTotal(new ArrayList<>());
+
+        assertEquals(0, result);
+    }
+
+    @Test
+    void testReduce_CorrectCapacityExtraction() {
+        List<Bogie> list = List.of(
+                new Bogie("A", 10),
+                new Bogie("B", 20)
+        );
+
+        int result = calculateTotal(list);
+
+        assertEquals(30, result);
+    }
+
+    @Test
+    void testReduce_AllBogiesIncluded() {
+        List<Bogie> list = List.of(
+                new Bogie("A", 10),
+                new Bogie("B", 20),
+                new Bogie("C", 30)
+        );
+
+        int result = calculateTotal(list);
+
+        assertEquals(60, result);
+    }
+
+    @Test
+    void testReduce_OriginalListUnchanged() {
+        List<Bogie> list = new ArrayList<>();
+        list.add(new Bogie("Sleeper", 72));
+        list.add(new Bogie("AC Chair", 56));
+
+        calculateTotal(list);
+
+        assertEquals(2, list.size());
     }
 }
